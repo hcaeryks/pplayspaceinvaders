@@ -20,7 +20,7 @@ class GameImage(gameobject.GameObject):
         
         # Loads image from the source
         self.file_name = image_file
-        self.image = pygame.image.load(image_file)
+        self.image = pygame.image.load(image_file).convert_alpha()
 
         # Size
         self.width = self.image.get_rect().width
