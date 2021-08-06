@@ -3,6 +3,7 @@ from PPlay.window import *
 from PPlay.sprite import *
 from PPlay.keyboard import *
 from PPlay.gameimage import *
+from PPlay.sound import *
 import globalVars as gv
 
 class Jogo(object):
@@ -14,6 +15,7 @@ class Jogo(object):
         self.laser = Animation("./assets/laser.png", 12, False)
         self.laser.set_total_duration(2000)
         self.laser.stop()
+        self.laserSound = Sound("./assets/explosion.ogg")
         self.bullets = []
         self.downspeed = 0
         self.aMovCd = 0.25
@@ -61,6 +63,7 @@ class Jogo(object):
         elif self.keyboard.key_pressed("LEFT_SHIFT") and self.spCdCurr == self.cooldown * 6:
             self.laser.stop()
             self.laser.play()
+            self.laserSound.play()
             self.spCdCurr -= self.janela.delta_time()
 
 
