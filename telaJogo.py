@@ -12,7 +12,8 @@ class Jogo(object):
         self.ship.set_position(janela.width/2-self.ship.width/2, janela.height-janela.height/100-self.ship.height)
         self.bullets = []
         self.downspeed = 200
-
+        self.aMovCd = 0.25
+        self.aMovCdCurr = 0.25
         if gv.GAME_DIFFICULTY == 0:
             self.speed = 400
             self.bspeed = 1300
@@ -45,6 +46,8 @@ class Jogo(object):
         self.aliens = [Sprite("./assets/alien.png") for i in range(self.aliencnt)]
         self.downspeed = 0
         self.setAlienPos()
+
+        self.next = True #t = direita, f = esquerda
 
     def update(self):
         self.ship.draw()
@@ -80,20 +83,34 @@ class Jogo(object):
         elif self.ship.x < 0:
             self.ship.x = 0
 
-        n, changed = 0, False
-        for i in range(len(self.aliens)):
-            self.aliens[i].draw()
-            self.aliens[i].x += self.aspeed * self.janela.delta_time()
-            self.aliens[i].y += abs(self.downspeed) * self.janela.delta_time()
-            if not changed and (self.aliens[i].x + self.aliens[i].width > self.janela.width or self.aliens[i].x < 0):
-                self.aspeed *= -1
-                self.downspeed = 30
-                changed = True
-            if self.aliens[i].x + self.aliens[i].width > self.janela.width: self.aliens[i].x = self.janela.width - self.aliens[i].width
-            elif self.aliens[i].x < 0: self.aliens[i].x = 0
+        
+        for alien in self.aliens:
+            if self.next:
+                if alien.x + alien.width >= self.janela.width:
+                    self.aspeed *= -1
+                    self.downspeed = 50
+                    self.next = False
+                    break
+            else:
+                if alien.x <= 0:
+                    self.aspeed *= -1
+                    self.downspeed = 50
+                    self.next = True
+                    break
+        
+        if self.aMovCdCurr <= 0: self.aMovCdCurr = self.aMovCd
+        if self.aMovCdCurr == self.aMovCd:
+            for i in range(len(self.aliens)):
+                self.aliens[i].draw()
+                self.aliens[i].x += (self.aspeed / 10) #* self.janela.delta_time()
+                self.aliens[i].y += self.downspeed #* self.janela.delta_time()
+                #if self.aliens[i].x + self.aliens[i].width > self.janela.width: self.aliens[i].x = self.janela.width - self.aliens[i].width
+                #elif self.aliens[i].x < 0: self.aliens[i].x = 0
+            self.downspeed = 0
+        self.aMovCdCurr -= self.janela.delta_time()
 
-        self.downspeed -= abs(self.downspeed) * self.janela.delta_time()
-        if self.downspeed <= 0: self.downspeed = 0
+        #self.downspeed = 0 #-= 0 abs(self.downspeed) * self.janela.delta_time()
+        #if self.downspeed <= 0: self.downspeed = 0
         n = 0
         for i in range(len(self.bullets)):
             self.bullets[i+n].y -= self.bspeed * self.janela.delta_time()
@@ -111,6 +128,6 @@ class Jogo(object):
         ypos = 0
         print(self.aliencnt/col)
         for i in range(int(self.aliencnt/col)):
-            ypos = i * 100
-            for e in range(0, col*100, 100):
-                self.aliens[int((e/100) + (i*col))].set_position((1600/2) - ((col * 100)/2) - (self.aliens[0].width/2) + e, 50 + ypos)
+            ypos = i * self.aliens[0].width
+            for e in range(0, int(col*self.aliens[0].width)*2, int(self.aliens[0].width)*2):
+                self.aliens[int((e/(self.aliens[0].width * 2)) + (i*col))].set_position((1600/2) - ((col * (self.aliens[0].width * 2))/2) - (self.aliens[0].width/2) + e, 50 + ypos)
