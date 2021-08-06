@@ -1,3 +1,4 @@
+from PPlay.animation import Animation
 from PPlay.window import *
 from PPlay.sprite import *
 from PPlay.keyboard import *
@@ -10,10 +11,13 @@ class Jogo(object):
         self.keyboard = Keyboard()
         self.ship = Sprite("./assets/ship.png")
         self.ship.set_position(janela.width/2-self.ship.width/2, janela.height-janela.height/100-self.ship.height)
+        self.laser = Animation("./assets/laser.png", 12, False)
+        self.laser.set_total_duration(2000)
+        self.laser.stop()
         self.bullets = []
-        self.downspeed = 200
+        self.downspeed = 0
         self.aMovCd = 0.25
-        self.aMovCdCurr = 0.25
+        self.aMovCdCurr = self.aMovCd
         if gv.GAME_DIFFICULTY == 0:
             self.speed = 400
             self.bspeed = 1300
@@ -38,9 +42,9 @@ class Jogo(object):
             self.aspeed = 540
             self.cooldown = 2
             self.aliencnt = 45
+        self.spCdCurr = self.cooldown * 6
         self.cooldownCurr = self.cooldown
         self.aliens = [Sprite("./assets/alien.png") for i in range(self.aliencnt)]
-        self.downspeed = 0
         self.setAlienPos()
         self.next = True
 
@@ -54,12 +58,21 @@ class Jogo(object):
             tiro.y = self.ship.y
             self.bullets.append(tiro)
             self.cooldownCurr -= self.janela.delta_time()
+        elif self.keyboard.key_pressed("LEFT_SHIFT") and self.spCdCurr == self.cooldown * 6:
+            self.laser.stop()
+            self.laser.play()
+            self.spCdCurr -= self.janela.delta_time()
 
-        if self.cooldownCurr < self.cooldown and self.cooldownCurr > 0:
+
+        if self.cooldownCurr < self.cooldown * 6 and self.spCdCurr > 0:
             self.cooldownCurr -= self.janela.delta_time()
+        if self.spCdCurr < self.cooldown * 6 and self.spCdCurr > 0:
+            self.spCdCurr -= self.janela.delta_time()
 
         if self.cooldownCurr <= 0:
             self.cooldownCurr = self.cooldown
+        if self.spCdCurr <= 0:
+            self.spCdCurr = self.cooldown * 6
 
         if self.keyboard.key_pressed("LEFT"):
             self.ship.x -= self.speed * self.janela.delta_time()
@@ -101,6 +114,10 @@ class Jogo(object):
             if self.bullets[i+n].y < 0:
                 self.bullets.pop(i+n)
                 n -= 1
+
+        self.laser.draw()
+        self.laser.set_position(self.ship.x + self.ship.width/2 - 150/2, self.ship.y - 1000)
+        if self.laser.is_playing(): self.laser.update()
 
     def setAlienPos(self):
         col = 0
