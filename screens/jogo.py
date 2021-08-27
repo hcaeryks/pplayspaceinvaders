@@ -4,7 +4,7 @@ from PPlay.sprite import *
 from PPlay.keyboard import *
 from PPlay.gameimage import *
 from PPlay.sound import *
-import globalVars as gv
+import globals as gv
 
 class Jogo(object):
     def __init__(self, janela):
@@ -46,13 +46,13 @@ class Jogo(object):
             self.aliencnt = 45
         self.spCdCurr = self.cooldown * 6
         self.cooldownCurr = self.cooldown
-        self.aliens = [Sprite("./assets/alien.png") for i in range(self.aliencnt)]
+        self.aliens = []
         self.setAlienPos()
         self.next = True
 
     def update(self):
         self.ship.draw()
-        [e.draw() for e in self.aliens]
+        [[i.draw() for i in e] for e in self.aliens]
         
         if self.keyboard.key_pressed("SPACE") and self.cooldown == self.cooldownCurr:
             tiro = Sprite("./assets/bullet.png")
@@ -66,7 +66,7 @@ class Jogo(object):
             self.laserSound.play()
             self.spCdCurr -= self.janela.delta_time()
 
-
+    
         if self.cooldownCurr < self.cooldown * 6 and self.spCdCurr > 0:
             self.cooldownCurr -= self.janela.delta_time()
         if self.spCdCurr < self.cooldown * 6 and self.spCdCurr > 0:
@@ -87,26 +87,29 @@ class Jogo(object):
         elif self.ship.x < 0:
             self.ship.x = 0
         
-        for alien in self.aliens:
-            if self.next:
-                if alien.x + alien.width >= self.janela.width:
-                    self.aspeed *= -1
-                    self.downspeed = 50
-                    self.next = False
-                    break
-            else:
-                if alien.x <= 0:
-                    self.aspeed *= -1
-                    self.downspeed = 50
-                    self.next = True
-                    break
+        for l in self.aliens:
+            for a in l:
+                if self.next:
+                    if a.x + a.width >= self.janela.width:
+                        self.aspeed *= -1
+                        self.downspeed = 50
+                        self.next = False
+                        break
+                else:
+                    if a.x <= 0:
+                        self.aspeed *= -1
+                        self.downspeed = 50
+                        self.next = True
+                        break
         
         if self.aMovCdCurr <= 0: self.aMovCdCurr = self.aMovCd
         if self.aMovCdCurr == self.aMovCd:
+            n = 0
             for i in range(len(self.aliens)):
-                self.aliens[i].draw()
-                self.aliens[i].x += (self.aspeed / 10)
-                self.aliens[i].y += self.downspeed
+                for e in range(len(self.aliens[i])):
+                    self.aliens[i][e-n].draw()
+                    self.aliens[i][e-n].x += (self.aspeed / 10)
+                    self.aliens[i][e-n].y += self.downspeed
             self.downspeed = 0
         self.aMovCdCurr -= self.janela.delta_time()
 
@@ -117,6 +120,7 @@ class Jogo(object):
             if self.bullets[i+n].y < 0:
                 self.bullets.pop(i+n)
                 n -= 1
+            [[e.collided(self.bullets[i+n]) for e in self.aliens[i]] for i in range(len(self.aliens))]
 
         self.laser.draw()
         self.laser.set_position(self.ship.x + self.ship.width/2 - 150/2, self.ship.y - 1000)
@@ -128,7 +132,8 @@ class Jogo(object):
         elif self.aliencnt == 21: col = 7
         elif self.aliencnt == 32: col = 8
         elif self.aliencnt == 45: col = 9
-        for i in range(int(self.aliencnt/col)):
-            ypos = i * self.aliens[0].width
-            for e in range(0, int(col*self.aliens[0].width)*2, int(self.aliens[0].width)*2):
-                self.aliens[int((e/(self.aliens[0].width * 2)) + (i*col))].set_position((1600/2) - ((col * (self.aliens[0].width * 2))/2) - (self.aliens[0].width/2) + e, 50 + ypos)
+        self.aliens = [[Sprite("./assets/alien.png") for i in range(col)] for e in range(int(self.aliencnt/col))]
+        for e in range(int(self.aliencnt/col)):
+            for i in range(col):
+                self.aliens[e][i].set_position(1600/2-((col * (self.aliens[0][0].width * 2))/2) - (self.aliens[0][0].width/2) + e, 10+e*5+e*self.aliens[0][0].height)
+                #self.aliens[int((e/(self.aliens[0].width * 2)) + (i*col))].set_position((1600/2) - ((col * (self.aliens[0].width * 2))/2) - (self.aliens[0].width/2) + e, 50 + ypos)

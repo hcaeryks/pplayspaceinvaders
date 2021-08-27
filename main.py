@@ -1,45 +1,42 @@
-from PPlay.window import *
-from PPlay.sprite import *
-from PPlay.keyboard import *
-from telaMenu import Menu
-from telaDificuldade import Dificuldade
-from telaRanking import Ranking
-from telaJogo import Jogo
-import globalVars as gv
+from PPlay import window, keyboard
+from screens import menu, dificuldade, ranking, jogonew
+import globals as g
 
-janela = Window(gv.GAME_WIDTH, gv.GAME_HEIGHT)
-janela.set_title(gv.GAME_TITLE)
+screen = window.Window(g.GAME_WIDTH, g.GAME_HEIGHT)
+screen.set_title(g.GAME_TITLE)
 
-dificuldades = Dificuldade(janela)
-ranking = Ranking(janela)
-menu = Menu(janela)
-jogo = None
+scrdificuldades = dificuldade.Dificuldade(screen)
+scrranking = None
+scrmenu = menu.Menu(screen)
+scrjogo = None
+
+kb = keyboard.Keyboard()
 currGme = 0
 
-background = Sprite("./assets/bg.png")
-keyboard = Keyboard()
-
-while gv.GAME_SCREEN > 0 and gv.GAME_SCREEN < 5:
-    janela.set_background_color(gv.GAME_BACKGROUNDCOLOR)
-    if gv.GAME_SCREEN >= 1 and gv.GAME_SCREEN <= 3:
-        pass
-    
-    if currGme == 0 and gv.GAME_SCREEN == 4:
+while g.GAME_SCREEN > 0 and g.GAME_SCREEN < 5:
+    screen.set_background_color(g.GAME_BACKGROUNDCOLOR)
+    if currGme == 0 and g.GAME_SCREEN == 4:
         currGme = 4
-        jogo = Jogo(janela)
-    elif currGme == 4 and gv.GAME_SCREEN != 4:
+        scrjogo = jogonew.Jogo(screen)
+    elif currGme == 4 and g.GAME_SCREEN != 4:
         currGme = 0
 
-    if gv.GAME_SCREEN == 1:
-        menu.update()
-    elif gv.GAME_SCREEN == 2:
-        dificuldades.update()
-    elif gv.GAME_SCREEN == 3:
-        ranking.update()
-    elif gv.GAME_SCREEN == 4:
-        jogo.update()
+    if currGme == 0 and g.GAME_SCREEN == 3:
+        currGme = 3
+        scrranking = ranking.Ranking(screen)
+    elif currGme == 3 and g.GAME_SCREEN != 3:
+        currGme = 0
 
-    if keyboard.key_pressed("ESC"):
-        gv.GAME_SCREEN = 1
+    if g.GAME_SCREEN == 1:
+        scrmenu.update()
+    elif g.GAME_SCREEN == 2:
+        scrdificuldades.update()
+    elif g.GAME_SCREEN == 3:
+        scrranking.update()
+    elif g.GAME_SCREEN == 4:
+        scrjogo.update()
 
-    janela.update()
+    if kb.key_pressed("ESC"):
+        g.GAME_SCREEN = 1
+
+    screen.update()

@@ -1,3 +1,5 @@
+# coding= utf-8
+
 """The most basic game class"""
 class GameObject():
     """Creates a GameObject in X, Y co-ords, with Width x Height"""
@@ -7,9 +9,15 @@ class GameObject():
         self.width = 0
         self.height = 0
 
+
     def collided(self, obj):
-        # Modules import
+        # Module import
         from . import collision
-        #from collision import Collision
-        
+
         return collision.Collision.collided(self, obj)
+
+    def load_sound(self, sound_file):
+        # Module import
+        from . import sound
+
+        self.sound = sound.Sound(sound_file)

@@ -1,6 +1,10 @@
+# coding= utf-8
+
 import pygame
 from pygame.locals import *
 from .point import *
+
+# -*- coding: utf-8 -*-
 
 # Initializes pygame's modules
 pygame.init()
@@ -10,7 +14,6 @@ class Mouse():
         self.BUTTON_LEFT = 1
         self.BUTTON_MIDDLE = 2
         self.BUTTON_RIGHT = 3
-        # Not implemented yet.
         self.WHEEL_UP = 4
         self.WHEEL_DOWN = 5
         
@@ -43,6 +46,8 @@ class Mouse():
     BUTTON_LEFT = 1
     BUTTON_MIDDLE = 2
     BUTTON_RIGHT = 3
+    WHEEL_UP = 4
+    WHEEL_DOWN = 5
     """
     def is_button_pressed(self, button):
         pressed_buttons = pygame.mouse.get_pressed()

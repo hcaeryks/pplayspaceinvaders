@@ -1,7 +1,7 @@
 from PPlay.window import *
 from PPlay.sprite import *
 from PPlay.mouse import *
-import globalVars as gv
+import globals as gv
 
 class Menu(object):
     def __init__(self, janela):
@@ -48,8 +48,7 @@ class Menu(object):
         elif self.mouse.is_over_object(self.btnRanking):
             self.btnRankingLit.draw()
             if self.mouse.is_button_pressed(1):
-                #gv.GAME_SCREEN = 3
-                self.erro.draw()
+                gv.GAME_SCREEN = 3
         elif self.mouse.is_over_object(self.btnSair):
             self.btnSairLit.draw()
             if self.mouse.is_button_pressed(1):

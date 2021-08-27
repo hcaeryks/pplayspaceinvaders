@@ -1,7 +1,7 @@
 from PPlay.window import *
 from PPlay.sprite import *
 from PPlay.mouse import *
-import globalVars as gv
+import globals as gv
 
 class Dificuldade(object):
     def __init__(self, janela):
