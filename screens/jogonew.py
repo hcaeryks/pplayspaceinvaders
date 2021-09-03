@@ -3,6 +3,7 @@ from math import log
 from random import randint
 from PPlay.keyboard import Keyboard
 import globals as g
+import time
 
 
 class Jogo():
@@ -22,6 +23,7 @@ class Jogo():
         self.invflash = 0
         self.invbool = True
         self.next = True
+        self.col = 0
         self.settings()
         self.setAlienPos()
 
@@ -68,7 +70,7 @@ class Jogo():
             self.cooldownCurr -= self.screen.delta_time()
         if self.cooldownCurr <= 0:
             self.cooldownCurr = self.cooldown
-        if self.aShootCdCurr < self.aShootCd and self.aShootCdCurr > 0:
+        if self.aShootCdCurr < self.aShootCd and self.aShootCdCurr > 0 or self.aShootCdCurr > self.aShootCd:
             self.aShootCdCurr -= self.screen.delta_time()
         if self.aShootCdCurr <= 0:
             self.aShootCdCurr = self.aShootCd
@@ -84,16 +86,16 @@ class Jogo():
         n = 0
         for i in range(len(self.bullets)):
             br = False
-            yb = 30 + self.aliens[-1][0].y if len(self.aliens[-1]) >= 1 else self.aliens[-2][0].y if len(
-                self.aliens[-3]) >= 1 else self.aliens[-4][0].y
-            yt = self.aliens[0][0].y if len(self.aliens[0]) >= 1 else self.aliens[1][0].y if len(
-                self.aliens[1]) >= 1 else self.aliens[2][0].y
+            yt = self.aliens[0][0].y-30
+            yb = 30+self.aliens[-1][0].y
             if self.bullets[i].y <= yb and self.bullets[i].y >= yt:
                 for e in range(len(self.aliens)-1, -1, -1):
                     for a in range(len(self.aliens[e])):
                         if self.bullets[i-n].collided(self.aliens[e][a]):
                             self.aliens[e].pop(a)
                             self.bullets.pop(i-n)
+                            if len(self.aliens[e]) == 0:
+                                self.aliens.pop(e)
                             n += 1
                             br = True
                             multiplier = 0
@@ -105,14 +107,37 @@ class Jogo():
                                 multiplier = 3
                             elif self.lastshot >= self.cooldown * 6:
                                 multiplier = 2
-                            self.points += int(10 *
-                                               self.pointscalar * log(multiplier))
+                            self.points += int(10 * self.pointscalar * log(multiplier))
                             self.lastshot = 0
+                            self.aspeed *= 1.1
+                            self.aShootCd *= 0.95
                             break
                     if br:
                         break
                 if br:
                     break
+
+        if self.relogio >= 1:
+            self.fps = self.frames
+            self.relogio = 0
+            self.frames = 0
+
+        if len(self.aliens) == 0:
+            #if self.aliencnt == 10: self.aliencnt = 21
+            #elif self.aliencnt == 21: self.aliencnt = 32
+            #elif self.aliencnt == 32: self.aliencnt = 45
+            self.aliencnt += 4
+            self.bspeed = 1300 - g.GAME_DIFFICULTY * 300 * 0.8
+            self.aspeed = 20 * (3 ** g.GAME_DIFFICULTY) * 1.2
+            self.cooldown = 0.25 * (2 ** g.GAME_DIFFICULTY) * 1.2
+            self.pointscalar = log(g.GAME_DIFFICULTY + 2)
+            self.aMovCd *= 0.90
+            self.aShootCd *= 0.90
+            self.aMovCdCurr = self.aMovCd
+            self.aShootCdCurr = self.aShootCd
+            #if g.GAME_DIFFICULTY != 3: g.GAME_DIFFICULTY += 1
+            #self.settings()
+            self.setAlienPos()
 
         if self.aShootCdCurr == self.aShootCd:
             m = randint(0, len(self.aliens)-1)
@@ -132,20 +157,16 @@ class Jogo():
                 self.lifes -= 1
                 self.ship.x = g.GAME_WIDTH/2 - self.ship.width/2
                 self.invul = 2
+                n -= 1
                 if self.lifes == 0:
                     nome = input("Insira seu nome: ")
                     with open("scores.txt", 'a') as scores:
                         scores.write(f"{nome}#{self.points}\n")
                     g.GAME_SCREEN = 1
-                n -= 1
             elif self.abullets[i+n].y > g.GAME_HEIGHT:
                 self.abullets.pop(i+n)
                 n -= 1
 
-        if self.relogio >= 1:
-            self.fps = self.frames
-            self.relogio = 0
-            self.frames = 0
 
         self.screen.draw_text(str(self.fps)+" FPS", 50,
                               170, 20, (255, 255, 255))
@@ -154,22 +175,17 @@ class Jogo():
         self.screen.draw_text("VIDAS: "+str(self.lifes),
                               50, 100, 50, (255, 255, 255), "Impact")
 
+
     def setAlienPos(self):
-        col = 0
-        if self.aliencnt == 10:
-            col = 5
-        elif self.aliencnt == 21:
-            col = 7
-        elif self.aliencnt == 32:
-            col = 8
-        elif self.aliencnt == 45:
-            col = 9
-        self.aliens = [[Sprite("./assets/alien.png") for i in range(col)]
-                       for e in range(int(self.aliencnt/col))]
-        for e in range(int(self.aliencnt/col)):
-            for i in range(col):
-                self.aliens[e][i].set_position(1600/2 - ((col * self.aliens[0][0].width * 2)/2) +
+        self.col = int(self.aliencnt/4)
+        self.aliens = [[Sprite("./assets/alien.png") for i in range(self.col)] for e in range(int(self.aliencnt/self.col))]
+        for e in range(int(self.aliencnt/self.col)):
+            for i in range(self.col):
+                self.aliens[e][i].set_position(1600/2 - ((self.col * self.aliens[0][0].width * 2)/2) +
                                                self.aliens[0][0].width * 2 * i, 10 + 10 * e + self.aliens[0][0].height * e)
+                self.aliens[e][i].draw()
+                self.screen.update()
+                time.sleep(0.1)
 
     def checkBounds(self):
         if self.ship.x > self.screen.width - self.ship.width:
@@ -177,20 +193,23 @@ class Jogo():
         elif self.ship.x < 0:
             self.ship.x = 0
 
-        for l in self.aliens:
-            for a in l:
-                if self.next:
-                    if a.x + a.width >= self.screen.width:
-                        self.aspeed *= -1
-                        self.downspeed = 50
-                        self.next = False
-                        break
-                else:
-                    if a.x <= 0:
-                        self.aspeed *= -1
-                        self.downspeed = 50
-                        self.next = True
-                        break
+        for l in range(len(self.aliens)):
+            first = self.aliens[l][0]
+            last = self.aliens[l][-1]
+            if self.next:
+                if last.x + last.width >= self.screen.width:
+                    print("wtf")
+                    self.aspeed *= -1
+                    self.downspeed = 50
+                    self.next = not self.next
+                    break
+            else:
+                if first.x <= 0:
+                    print("wtf2")
+                    self.aspeed *= -1
+                    self.downspeed = 50
+                    self.next = not self.next
+                    break
 
     def settings(self):
         self.speed = 400 + g.GAME_DIFFICULTY * 300
@@ -199,13 +218,13 @@ class Jogo():
         self.cooldown = 0.25 * (2 ** g.GAME_DIFFICULTY)
         self.pointscalar = log(g.GAME_DIFFICULTY + 2)
         if g.GAME_DIFFICULTY == 0:
-            self.aliencnt = 10
+            self.aliencnt = 12
         elif g.GAME_DIFFICULTY == 1:
-            self.aliencnt = 21
+            self.aliencnt = 20
         elif g.GAME_DIFFICULTY == 2:
-            self.aliencnt = 32
+            self.aliencnt = 28
         elif g.GAME_DIFFICULTY == 3:
-            self.aliencnt = 45
+            self.aliencnt = 36
         self.downspeed = 0
         self.lastshot = 0
         self.aMovCd = 0.25

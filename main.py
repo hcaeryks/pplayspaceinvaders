@@ -1,6 +1,7 @@
 from PPlay import window, keyboard
 from screens import menu, dificuldade, ranking, jogonew
 import globals as g
+import os.path
 
 screen = window.Window(g.GAME_WIDTH, g.GAME_HEIGHT)
 screen.set_title(g.GAME_TITLE)
@@ -12,6 +13,10 @@ scrjogo = None
 
 kb = keyboard.Keyboard()
 currGme = 0
+
+if not os.path.isfile("scores.txt"):
+    f = open("scores.txt", "x")
+    f.close()
 
 while g.GAME_SCREEN > 0 and g.GAME_SCREEN < 5:
     screen.set_background_color(g.GAME_BACKGROUNDCOLOR)
