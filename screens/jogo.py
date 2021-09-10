@@ -98,23 +98,17 @@ class Jogo():
                             n += 1
                             br = True
                             multiplier = 0
-                            if self.lastshot < self.cooldown * 2:
-                                multiplier = 7
-                            elif self.lastshot < self.cooldown * 4:
-                                multiplier = 5
-                            elif self.lastshot < self.cooldown * 6:
-                                multiplier = 3
-                            elif self.lastshot >= self.cooldown * 6:
-                                multiplier = 2
+                            if self.lastshot < self.cooldown * 2: multiplier = 7
+                            elif self.lastshot < self.cooldown * 4: multiplier = 5
+                            elif self.lastshot < self.cooldown * 6: multiplier = 3
+                            elif self.lastshot >= self.cooldown * 6: multiplier = 2
                             self.points += int(10 * self.pointscalar * log(multiplier))
                             self.lastshot = 0
                             self.aspeed *= 1.1
-                            self.aShootCd *= 0.95
+                            self.aShootCd *= 0.98
                             break
-                    if br:
-                        break
-                if br:
-                    break
+                    if br: break
+                if br: break
 
         if self.relogio >= 1:
             self.fps = self.frames
@@ -233,7 +227,7 @@ class Jogo():
         self.downspeed = 0
         self.lastshot = 0
         self.aMovCd = 0.25
-        self.aShootCd = 1 * randint(1, 3)
+        self.aShootCd = 1 #* randint(1, 3) RNG IS CRINGE, DON'T USE THIS
         self.aMovCdCurr = self.aMovCd
         self.aShootCdCurr = self.aShootCd
         self.cooldownCurr = self.cooldown
