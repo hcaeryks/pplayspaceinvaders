@@ -9,7 +9,7 @@ class Jogo():
     def __init__(self, screen):
         self.screen = screen
         self.keyboard = Keyboard()
-        self.ship = Sprite("./assets/ship.png")
+        self.ship = Sprite("./assets/ships.png", 2)
         self.ship.set_position(self.screen.width / 2 - self.ship.width/2,
                                self.screen.height-self.screen.height/100-self.ship.height)
         self.relogio, self.frames, self.fps = 0, 0, "Calculando..."
@@ -23,6 +23,9 @@ class Jogo():
         self.invbool = True
         self.next = True
         self.col = 0
+        self.shotcount = 0
+        self.shootLimitCd = 3
+        self.shootLimitCdCurr = 0
         self.settings()
         self.setAlienPos()
 
@@ -40,12 +43,16 @@ class Jogo():
         if self.invul <= 0 or self.invbool:
             self.ship.draw()
 
-        if self.keyboard.key_pressed("SPACE") and self.cooldown == self.cooldownCurr:
+        if self.keyboard.key_pressed("SPACE") and self.cooldown == self.cooldownCurr and self.shootLimitCdCurr <= 0:
             tiro = Sprite("./assets/bullet.png")
             tiro.x = self.ship.x + self.ship.width/2 - tiro.width/2
             tiro.y = self.ship.y
             self.bullets.append(tiro)
             self.cooldownCurr -= self.screen.delta_time()
+            self.shotcount += 1
+            if self.shotcount == 10:
+                self.shootLimitCdCurr = self.shootLimitCd
+                self.ship.set_curr_frame(1)
 
         if self.keyboard.key_pressed("LEFT"):
             self.ship.x -= self.speed * self.screen.delta_time()
@@ -73,6 +80,11 @@ class Jogo():
             self.aShootCdCurr -= self.screen.delta_time()
         if self.aShootCdCurr <= 0:
             self.aShootCdCurr = self.aShootCd
+        if self.shootLimitCdCurr <= self.shootLimitCd and self.shootLimitCdCurr > 0:
+            self.shootLimitCdCurr -= self.screen.delta_time()
+            if self.shootLimitCdCurr <= 0:
+                self.shotcount = 0
+                self.ship.set_curr_frame(0)
 
         n = 0
         for i in range(len(self.bullets)):
