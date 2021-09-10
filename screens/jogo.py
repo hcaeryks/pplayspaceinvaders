@@ -172,6 +172,7 @@ class Jogo():
 
 
     def setAlienPos(self):
+        self.next = True
         self.col = int(self.aliencnt/4)
         self.aliens = [[Sprite("./assets/alien.png") for i in range(self.col)] for e in range(int(self.aliencnt/self.col))]
         for e in range(int(self.aliencnt/self.col)):
