@@ -191,14 +191,12 @@ class Jogo():
             last = self.aliens[l][-1]
             if self.next:
                 if last.x + last.width >= self.screen.width:
-                    print("wtf")
                     self.aspeed *= -1
                     self.downspeed = 50
                     self.next = not self.next
                     break
             else:
                 if first.x <= 0:
-                    print("wtf2")
                     self.aspeed *= -1
                     self.downspeed = 50
                     self.next = not self.next
