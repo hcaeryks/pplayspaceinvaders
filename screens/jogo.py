@@ -158,14 +158,10 @@ class Jogo():
                 self.invul = 2
                 n -= 1
                 if self.lifes == 0:
-                    nome = input("Insira seu nome: ")
-                    with open("scores.txt", 'a') as scores:
-                        scores.write(f"{nome}#{self.points}\n")
-                    g.GAME_SCREEN = 1
+                    self.endStage()
             elif self.abullets[i+n].y > g.GAME_HEIGHT:
                 self.abullets.pop(i+n)
                 n -= 1
-
 
         self.screen.draw_text(str(self.fps)+" FPS", 50,
                               170, 20, (255, 255, 255))
@@ -192,6 +188,9 @@ class Jogo():
         elif self.ship.x < 0:
             self.ship.x = 0
 
+        if self.aliens[-1][-1].y > g.GAME_HEIGHT - self.aliens[-1][-1].height:
+            self.endStage()
+
         for l in range(len(self.aliens)):
             first = self.aliens[l][0]
             last = self.aliens[l][-1]
@@ -209,6 +208,12 @@ class Jogo():
                     self.downspeed = 50
                     self.next = not self.next
                     break
+    
+    def endStage(self):
+        nome = input("Insira seu nome: ")
+        with open("scores.txt", 'a') as scores:
+            scores.write(f"{nome}#{self.points}\n")
+        g.GAME_SCREEN = 1
 
     def settings(self):
         self.speed = 400 + g.GAME_DIFFICULTY * 300
