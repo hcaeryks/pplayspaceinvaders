@@ -1,5 +1,5 @@
 from PPlay import window, keyboard
-from screens import menu, dificuldade, ranking, jogonew
+from screens import menu, dificuldade, ranking, jogo
 import globals as g
 import os.path
 
@@ -22,7 +22,7 @@ while g.GAME_SCREEN > 0 and g.GAME_SCREEN < 5:
     screen.set_background_color(g.GAME_BACKGROUNDCOLOR)
     if currGme == 0 and g.GAME_SCREEN == 4:
         currGme = 4
-        scrjogo = jogonew.Jogo(screen)
+        scrjogo = jogo.Jogo(screen)
     elif currGme == 4 and g.GAME_SCREEN != 4:
         currGme = 0
 
